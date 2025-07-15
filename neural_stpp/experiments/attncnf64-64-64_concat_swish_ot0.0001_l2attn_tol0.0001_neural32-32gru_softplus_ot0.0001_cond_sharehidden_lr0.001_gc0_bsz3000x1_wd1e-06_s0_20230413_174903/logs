@@ -1,0 +1,342 @@
+2023-04-13 17:49:04,819 - Namespace(data='crimenyc', model='attncnf', tpp='neural', actfn='swish', tpp_actfn='softplus', hdims='64-64-64', layer_type='concat', tpp_hdims='32-32', tpp_cond=True, tpp_style='gru', share_hidden=True, solve_reverse=False, l2_attn=True, naive_hutch=False, tol=0.0001, otreg_strength=0.0001, tpp_otreg_strength=0.0001, warmup_itrs=0, num_iterations=300, lr=0.001, momentum=0.9, weight_decay=1e-06, gradclip=10000000000.0, max_events=3000, test_bsz=32, experiment_dir='experiments', experiment_id='20230413_174903', ngpus=1, seed=0, resume=None, logfreq=10, testfreq=30, port=14620)
+2023-04-13 17:49:04,819 - Saving to experiments/attncnf64-64-64_concat_swish_ot0.0001_l2attn_tol0.0001_neural32-32gru_softplus_ot0.0001_cond_sharehidden_lr0.001_gc0_bsz3000x1_wd1e-06_s0_20230413_174903
+2023-04-13 17:49:04,820 - Found 2 CUDA devices.
+2023-04-13 17:49:04,822 - NVIDIA GeForce RTX 2080 Ti 	 Memory: 10.76GB
+2023-04-13 17:49:04,822 - NVIDIA GeForce RTX 2080 Ti 	 Memory: 10.76GB
+2023-04-13 17:49:06,817 - 320 training examples, 49 val examples, 32 test examples
+2023-04-13 17:49:06,873 - DistributedDataParallel(
+  (module): SelfAttentiveCNFSpatiotemporalModel(
+    (temporal_model): NeuralPointProcess(
+      (hidden_state_dynamics): HiddenStateODEFuncList(
+        (odefuncs): ModuleList(
+          (0): GRUHiddenStateODEFunc(
+            (dstate_net): SequentialDiffEq(
+              (layers): ModuleList(
+                (0): ConcatLinear_v2(
+                  (_layer): Linear(in_features=32, out_features=32, bias=True)
+                  (_hyper_bias): Linear(in_features=1, out_features=32, bias=False)
+                )
+                (1): ActNorm(32)
+                (2): Softplus(beta=1, threshold=20)
+                (3): ConcatLinear_v2(
+                  (_layer): Linear(in_features=32, out_features=32, bias=True)
+                  (_hyper_bias): Linear(in_features=1, out_features=32, bias=False)
+                )
+              )
+            )
+            (update_net): GRUCell(2, 32)
+          )
+        )
+      )
+      (ode_solver): TimeVariableODE(
+        method=dopri5, atol=0.0001, rtol=0.0001, energy=0.0001
+        (func): IntensityODEFunc(
+          (dstate_fn): HiddenStateODEFuncList(
+            (odefuncs): ModuleList(
+              (0): GRUHiddenStateODEFunc(
+                (dstate_net): SequentialDiffEq(
+                  (layers): ModuleList(
+                    (0): ConcatLinear_v2(
+                      (_layer): Linear(in_features=32, out_features=32, bias=True)
+                      (_hyper_bias): Linear(in_features=1, out_features=32, bias=False)
+                    )
+                    (1): ActNorm(32)
+                    (2): Softplus(beta=1, threshold=20)
+                    (3): ConcatLinear_v2(
+                      (_layer): Linear(in_features=32, out_features=32, bias=True)
+                      (_hyper_bias): Linear(in_features=1, out_features=32, bias=False)
+                    )
+                  )
+                )
+                (update_net): GRUCell(2, 32)
+              )
+            )
+          )
+          (intensity_fn): Sequential(
+            (0): Linear(in_features=16, out_features=64, bias=True)
+            (1): Softplus(beta=1, threshold=20)
+            (2): Linear(in_features=64, out_features=1, bias=True)
+          )
+        )
+      )
+    )
+    (spatial_model): SelfAttentiveCNF(
+      (t_embedding): EventTimeEncoding()
+      (odefunc): SelfAttentiveODEFunc(
+        (embedding): SequentialDiffEq(
+          (layers): ModuleList(
+            (0): ConcatLinear_v2(
+              (_layer): Linear(in_features=82, out_features=64, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+            )
+            (1): TimeDependentSwish(
+              (beta): Sequential(
+                (0): Linear(in_features=1, out_features=64, bias=True)
+                (1): Softplus(beta=1, threshold=20)
+                (2): Linear(in_features=64, out_features=64, bias=True)
+                (3): Softplus(beta=1, threshold=20)
+              )
+            )
+            (2): ConcatLinear_v2(
+              (_layer): Linear(in_features=64, out_features=64, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+            )
+            (3): TimeDependentSwish(
+              (beta): Sequential(
+                (0): Linear(in_features=1, out_features=64, bias=True)
+                (1): Softplus(beta=1, threshold=20)
+                (2): Linear(in_features=64, out_features=64, bias=True)
+                (3): Softplus(beta=1, threshold=20)
+              )
+            )
+            (4): ConcatLinear_v2(
+              (_layer): Linear(in_features=64, out_features=64, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+            )
+          )
+        )
+        (self_attns): ModuleList(
+          (0): L2MultiheadAttention(
+            (out_proj): Linear(in_features=64, out_features=64, bias=True)
+          )
+          (1): L2MultiheadAttention(
+            (out_proj): Linear(in_features=64, out_features=64, bias=True)
+          )
+        )
+        (attn_actnorms): ModuleList(
+          (0): ActNorm(64)
+          (1): ActNorm(64)
+        )
+        (fcs): ModuleList(
+          (0): Sequential(
+            (0): Linear(in_features=64, out_features=256, bias=True)
+            (1): Softplus(beta=1, threshold=20)
+            (2): Linear(in_features=256, out_features=64, bias=True)
+          )
+          (1): Sequential(
+            (0): Linear(in_features=64, out_features=256, bias=True)
+            (1): Softplus(beta=1, threshold=20)
+            (2): Linear(in_features=256, out_features=64, bias=True)
+          )
+        )
+        (fc_actnorms): ModuleList(
+          (0): ActNorm(64)
+          (1): ActNorm(64)
+        )
+        (attn_gates): ModuleList(
+          (0): TanhGate()
+          (1): TanhGate()
+        )
+        (fc_gates): ModuleList(
+          (0): TanhGate()
+          (1): TanhGate()
+        )
+        (output_proj): SequentialDiffEq(
+          (layers): ModuleList(
+            (0): ConcatLinear_v2(
+              (_layer): Linear(in_features=64, out_features=64, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+            )
+            (1): TimeDependentSwish(
+              (beta): Sequential(
+                (0): Linear(in_features=1, out_features=64, bias=True)
+                (1): Softplus(beta=1, threshold=20)
+                (2): Linear(in_features=64, out_features=64, bias=True)
+                (3): Softplus(beta=1, threshold=20)
+              )
+            )
+            (2): ConcatLinear_v2(
+              (_layer): Linear(in_features=64, out_features=2, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=2, bias=False)
+            )
+          )
+        )
+      )
+      (cnf): TimeVariableCNF(
+        method=dopri5, tol=0.0001, energy=0.0001, jacnorm=0.0001
+        (func): SelfAttentiveODEFunc(
+          (embedding): SequentialDiffEq(
+            (layers): ModuleList(
+              (0): ConcatLinear_v2(
+                (_layer): Linear(in_features=82, out_features=64, bias=True)
+                (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+              )
+              (1): TimeDependentSwish(
+                (beta): Sequential(
+                  (0): Linear(in_features=1, out_features=64, bias=True)
+                  (1): Softplus(beta=1, threshold=20)
+                  (2): Linear(in_features=64, out_features=64, bias=True)
+                  (3): Softplus(beta=1, threshold=20)
+                )
+              )
+              (2): ConcatLinear_v2(
+                (_layer): Linear(in_features=64, out_features=64, bias=True)
+                (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+              )
+              (3): TimeDependentSwish(
+                (beta): Sequential(
+                  (0): Linear(in_features=1, out_features=64, bias=True)
+                  (1): Softplus(beta=1, threshold=20)
+                  (2): Linear(in_features=64, out_features=64, bias=True)
+                  (3): Softplus(beta=1, threshold=20)
+                )
+              )
+              (4): ConcatLinear_v2(
+                (_layer): Linear(in_features=64, out_features=64, bias=True)
+                (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+              )
+            )
+          )
+          (self_attns): ModuleList(
+            (0): L2MultiheadAttention(
+              (out_proj): Linear(in_features=64, out_features=64, bias=True)
+            )
+            (1): L2MultiheadAttention(
+              (out_proj): Linear(in_features=64, out_features=64, bias=True)
+            )
+          )
+          (attn_actnorms): ModuleList(
+            (0): ActNorm(64)
+            (1): ActNorm(64)
+          )
+          (fcs): ModuleList(
+            (0): Sequential(
+              (0): Linear(in_features=64, out_features=256, bias=True)
+              (1): Softplus(beta=1, threshold=20)
+              (2): Linear(in_features=256, out_features=64, bias=True)
+            )
+            (1): Sequential(
+              (0): Linear(in_features=64, out_features=256, bias=True)
+              (1): Softplus(beta=1, threshold=20)
+              (2): Linear(in_features=256, out_features=64, bias=True)
+            )
+          )
+          (fc_actnorms): ModuleList(
+            (0): ActNorm(64)
+            (1): ActNorm(64)
+          )
+          (attn_gates): ModuleList(
+            (0): TanhGate()
+            (1): TanhGate()
+          )
+          (fc_gates): ModuleList(
+            (0): TanhGate()
+            (1): TanhGate()
+          )
+          (output_proj): SequentialDiffEq(
+            (layers): ModuleList(
+              (0): ConcatLinear_v2(
+                (_layer): Linear(in_features=64, out_features=64, bias=True)
+                (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+              )
+              (1): TimeDependentSwish(
+                (beta): Sequential(
+                  (0): Linear(in_features=1, out_features=64, bias=True)
+                  (1): Softplus(beta=1, threshold=20)
+                  (2): Linear(in_features=64, out_features=64, bias=True)
+                  (3): Softplus(beta=1, threshold=20)
+                )
+              )
+              (2): ConcatLinear_v2(
+                (_layer): Linear(in_features=64, out_features=2, bias=True)
+                (_hyper_bias): Linear(in_features=1, out_features=2, bias=False)
+              )
+            )
+          )
+        )
+      )
+      (base_cnf): TimeVariableCNF(
+        method=dopri5, tol=1e-06, energy=0.0001, jacnorm=0.0001
+        (func): SequentialDiffEq(
+          (layers): ModuleList(
+            (0): ConcatLinear_v2(
+              (_layer): Linear(in_features=2, out_features=64, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+            )
+            (1): TimeDependentSwish(
+              (beta): Sequential(
+                (0): Linear(in_features=1, out_features=64, bias=True)
+                (1): Softplus(beta=1, threshold=20)
+                (2): Linear(in_features=64, out_features=64, bias=True)
+                (3): Softplus(beta=1, threshold=20)
+              )
+            )
+            (2): ConcatLinear_v2(
+              (_layer): Linear(in_features=64, out_features=64, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+            )
+            (3): TimeDependentSwish(
+              (beta): Sequential(
+                (0): Linear(in_features=1, out_features=64, bias=True)
+                (1): Softplus(beta=1, threshold=20)
+                (2): Linear(in_features=64, out_features=64, bias=True)
+                (3): Softplus(beta=1, threshold=20)
+              )
+            )
+            (4): ConcatLinear_v2(
+              (_layer): Linear(in_features=64, out_features=64, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=64, bias=False)
+            )
+            (5): TimeDependentSwish(
+              (beta): Sequential(
+                (0): Linear(in_features=1, out_features=64, bias=True)
+                (1): Softplus(beta=1, threshold=20)
+                (2): Linear(in_features=64, out_features=64, bias=True)
+                (3): Softplus(beta=1, threshold=20)
+              )
+            )
+            (6): ConcatLinear_v2(
+              (_layer): Linear(in_features=64, out_features=2, bias=True)
+              (_hyper_bias): Linear(in_features=1, out_features=2, bias=False)
+            )
+          )
+        )
+      )
+      (base_dist_params): Sequential(
+        (0): Linear(in_features=80, out_features=128, bias=True)
+        (1): ReLU(inplace=True)
+        (2): Linear(in_features=128, out_features=4, bias=True)
+      )
+    )
+  )
+)
+2023-04-13 17:49:12,979 - Iter 0 | Epoch 0 | LR 0.00100 | Time 6.1 | Temporal -1.3556(-1.3556) | Spatial -2.8454(-2.8454) | GradNorm 14.75(14.75) | NFE 2830 | Mem 2612.14 MB
+2023-04-13 17:49:45,719 - [Test] Iter 0 | Val Temporal -0.7159 | Val Spatial -2.8958 | Test Temporal -0.6779 | Test Spatial -2.8155
+2023-04-13 17:50:49,018 - Iter 10 | Epoch 0 | LR 0.00100 | Time 63.3 | Temporal 0.2868(-1.1589) | Spatial -2.8217(-2.8453) | GradNorm 10.82(16.99) | NFE 3060 | Mem 2619.83 MB
+2023-04-13 17:51:45,065 - Iter 20 | Epoch 1 | LR 0.00099 | Time 56.0 | Temporal 0.0424(-0.9259) | Spatial -2.7530(-2.8343) | GradNorm 9.97(15.98) | NFE 2488 | Mem 2619.83 MB
+2023-04-13 17:52:46,268 - Iter 30 | Epoch 2 | LR 0.00098 | Time 61.2 | Temporal 0.3295(-0.7037) | Spatial -2.5956(-2.8031) | GradNorm 30.22(16.21) | NFE 2860 | Mem 2619.83 MB
+2023-04-13 17:53:19,829 - [Test] Iter 30 | Val Temporal 0.2371 | Val Spatial -2.6007 | Test Temporal 0.2504 | Test Spatial -2.5423
+2023-04-13 17:54:19,305 - Iter 40 | Epoch 3 | LR 0.00096 | Time 59.5 | Temporal 0.3788(-0.5284) | Spatial -2.5658(-2.7649) | GradNorm 8.12(18.18) | NFE 3000 | Mem 2620.09 MB
+2023-04-13 17:55:17,376 - Iter 50 | Epoch 4 | LR 0.00093 | Time 58.1 | Temporal 0.0850(-0.3941) | Spatial -2.5857(-2.7289) | GradNorm 6.99(19.88) | NFE 2464 | Mem 2620.09 MB
+2023-04-13 17:56:17,359 - Iter 60 | Epoch 5 | LR 0.00090 | Time 60.0 | Temporal 0.3884(-0.2761) | Spatial -2.5891(-2.6985) | GradNorm 19.22(19.40) | NFE 3048 | Mem 2620.09 MB
+2023-04-13 17:56:48,476 - [Test] Iter 60 | Val Temporal 0.2449 | Val Spatial -2.5514 | Test Temporal 0.2584 | Test Spatial -2.4855
+2023-04-13 17:57:45,789 - Iter 70 | Epoch 5 | LR 0.00087 | Time 57.3 | Temporal 0.4149(-0.1884) | Spatial -2.5430(-2.6674) | GradNorm 32.28(20.29) | NFE 3174 | Mem 2620.09 MB
+2023-04-13 17:58:46,055 - Iter 80 | Epoch 6 | LR 0.00083 | Time 60.3 | Temporal 0.1574(-0.1100) | Spatial -2.5281(-2.6392) | GradNorm 42.53(21.69) | NFE 2656 | Mem 2620.09 MB
+2023-04-13 17:59:47,961 - Iter 90 | Epoch 7 | LR 0.00079 | Time 61.9 | Temporal -0.3515(-0.0335) | Spatial -2.5170(-2.6126) | GradNorm 13.14(21.88) | NFE 2298 | Mem 2620.09 MB
+2023-04-13 18:00:24,571 - [Test] Iter 90 | Val Temporal 0.2509 | Val Spatial -2.4908 | Test Temporal 0.2652 | Test Spatial -2.4399
+2023-04-13 18:01:20,125 - Iter 100 | Epoch 8 | LR 0.00075 | Time 55.5 | Temporal 0.1603(-0.0010) | Spatial -2.4334(-2.5874) | GradNorm 27.55(23.08) | NFE 2704 | Mem 2620.09 MB
+2023-04-13 18:02:20,189 - Iter 110 | Epoch 9 | LR 0.00070 | Time 60.1 | Temporal 0.3544(0.0547) | Spatial -2.4229(-2.5642) | GradNorm 24.02(23.25) | NFE 3004 | Mem 2620.86 MB
+2023-04-13 18:03:19,691 - Iter 120 | Epoch 10 | LR 0.00065 | Time 59.5 | Temporal 0.3236(0.0906) | Spatial -2.4318(-2.5412) | GradNorm 39.33(23.16) | NFE 2986 | Mem 2620.86 MB
+2023-04-13 18:03:53,696 - [Test] Iter 120 | Val Temporal 0.2569 | Val Spatial -2.4193 | Test Temporal 0.2717 | Test Spatial -2.3724
+2023-04-13 18:04:53,906 - Iter 130 | Epoch 10 | LR 0.00060 | Time 60.2 | Temporal -0.3236(0.1144) | Spatial -2.4174(-2.5178) | GradNorm 8.99(23.66) | NFE 2382 | Mem 2620.86 MB
+2023-04-13 18:05:55,346 - Iter 140 | Epoch 11 | LR 0.00055 | Time 61.4 | Temporal 0.0929(0.1392) | Spatial -2.3654(-2.4917) | GradNorm 43.24(27.05) | NFE 2590 | Mem 2620.86 MB
+2023-04-13 18:06:57,623 - Iter 150 | Epoch 12 | LR 0.00050 | Time 62.3 | Temporal 0.2300(0.1658) | Spatial -2.3144(-2.4599) | GradNorm 42.52(38.26) | NFE 2918 | Mem 2620.86 MB
+2023-04-13 18:07:32,369 - [Test] Iter 150 | Val Temporal 0.2606 | Val Spatial -2.2840 | Test Temporal 0.2762 | Test Spatial -2.2349
+2023-04-13 18:08:35,222 - Iter 160 | Epoch 13 | LR 0.00045 | Time 62.8 | Temporal 0.2313(0.1710) | Spatial -2.3110(-2.4268) | GradNorm 41.32(47.73) | NFE 2942 | Mem 2620.86 MB
+2023-04-13 18:09:38,721 - Iter 170 | Epoch 14 | LR 0.00040 | Time 63.5 | Temporal 0.0952(0.1990) | Spatial -2.3469(-2.3901) | GradNorm 222.91(80.10) | NFE 2692 | Mem 2620.86 MB
+2023-04-13 18:10:41,063 - Iter 180 | Epoch 15 | LR 0.00035 | Time 62.3 | Temporal 0.3645(0.2088) | Spatial -2.1425(-2.3595) | GradNorm 187.59(113.66) | NFE 3160 | Mem 2620.86 MB
+2023-04-13 18:11:18,187 - [Test] Iter 180 | Val Temporal 0.2632 | Val Spatial -2.1392 | Test Temporal 0.2792 | Test Spatial -2.0872
+2023-04-13 18:12:22,144 - Iter 190 | Epoch 15 | LR 0.00030 | Time 63.9 | Temporal 0.5678(0.2140) | Spatial -1.9917(-2.3132) | GradNorm 217.03(150.88) | NFE 3728 | Mem 2620.86 MB
+2023-04-13 18:13:25,446 - Iter 200 | Epoch 16 | LR 0.00025 | Time 63.3 | Temporal -0.3209(0.2233) | Spatial -2.1202(-2.2769) | GradNorm 111.53(181.08) | NFE 2418 | Mem 2620.86 MB
+2023-04-13 18:14:28,443 - Iter 210 | Epoch 17 | LR 0.00021 | Time 63.0 | Temporal 0.0449(0.2235) | Spatial -2.0822(-2.2424) | GradNorm 585.66(232.88) | NFE 2610 | Mem 2620.86 MB
+2023-04-13 18:15:04,810 - [Test] Iter 210 | Val Temporal 0.2647 | Val Spatial -2.0574 | Test Temporal 0.2810 | Test Spatial -1.9886
+2023-04-13 18:16:08,369 - Iter 220 | Epoch 18 | LR 0.00017 | Time 63.5 | Temporal -0.3113(0.2332) | Spatial -2.1083(-2.2072) | GradNorm 675.57(275.83) | NFE 2442 | Mem 2620.86 MB
+2023-04-13 18:17:13,407 - Iter 230 | Epoch 19 | LR 0.00013 | Time 65.0 | Temporal 0.4163(0.2425) | Spatial -2.0602(-2.1700) | GradNorm 282.25(309.96) | NFE 3186 | Mem 2620.86 MB
+2023-04-13 18:18:18,011 - Iter 240 | Epoch 20 | LR 0.00010 | Time 64.6 | Temporal 0.2925(0.2468) | Spatial -2.0492(-2.1377) | GradNorm 492.08(317.56) | NFE 3048 | Mem 2620.86 MB
+2023-04-13 18:18:55,600 - [Test] Iter 240 | Val Temporal 0.2654 | Val Spatial -1.9684 | Test Temporal 0.2819 | Test Spatial -1.9027
+2023-04-13 18:19:59,787 - Iter 250 | Epoch 20 | LR 0.00007 | Time 64.2 | Temporal 0.4168(0.2458) | Spatial -2.0556(-2.1059) | GradNorm 366.92(309.07) | NFE 3198 | Mem 2620.86 MB
+2023-04-13 18:21:07,672 - Iter 260 | Epoch 21 | LR 0.00004 | Time 67.9 | Temporal 0.4858(0.2630) | Spatial -2.0208(-2.0829) | GradNorm 701.56(348.30) | NFE 3710 | Mem 2620.86 MB
+2023-04-13 18:22:11,367 - Iter 270 | Epoch 22 | LR 0.00002 | Time 63.7 | Temporal 0.2929(0.2577) | Spatial -1.9646(-2.0664) | GradNorm 383.38(349.30) | NFE 3060 | Mem 2620.86 MB
+2023-04-13 18:22:46,699 - [Test] Iter 270 | Val Temporal 0.2656 | Val Spatial -1.9480 | Test Temporal 0.2823 | Test Spatial -1.8796
+2023-04-13 18:23:52,903 - Iter 280 | Epoch 23 | LR 0.00001 | Time 66.2 | Temporal 0.2354(0.2687) | Spatial -1.8750(-2.0399) | GradNorm 146.63(334.39) | NFE 3074 | Mem 2620.86 MB
+2023-04-13 18:24:54,098 - Iter 290 | Epoch 24 | LR 0.00000 | Time 61.2 | Temporal 0.1733(0.2517) | Spatial -1.9227(-2.0253) | GradNorm 224.24(306.38) | NFE 2890 | Mem 2620.86 MB
